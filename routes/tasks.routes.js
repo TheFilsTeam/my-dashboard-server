@@ -17,6 +17,7 @@ router.post("/", (req, res) => {
 });
 
 router.get("/", (req, res) => {
+    console.log("payload", req.payload);
     Task.find({owner: req.__jwt_userId})
     //   .populate('owner')
       .then(response => res.status(200).json(response))
@@ -54,13 +55,7 @@ router.put('/:taskId', (req, res) => {
         return;
     }
 
-    const newDetails = {
-        title: req.body.title,
-        description: req.body.description,
-        tasks: req.body.tasks
-    }
-
-    Task.findOneAndUpdate(query, newDetails, { new: true })
+    Task.findOneAndUpdate(query, req.body, { new: true })
         .then((updatedTask) => res.json(updatedTask))
         .catch(err => {
             console.log("error updating task", err);
