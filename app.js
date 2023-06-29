@@ -1,3 +1,4 @@
+const decodeJwt = require('./middleware/decodeJwt.middleware')
 // ℹ️ Gets access to environment variables/settings
 // https://www.npmjs.com/package/dotenv
 require("dotenv").config();
@@ -14,12 +15,12 @@ const app = express();
 // ℹ️ This function is getting exported from the config folder. It runs most pieces of middleware
 require("./config")(app);
 
-// 👇 Start handling routes here
-const indexRoutes = require("./routes/index.routes");
-app.use("/api", indexRoutes);
+app.use(decodeJwt);
 
-const authRoutes = require("./routes/auth.routes");
-app.use("/auth", authRoutes);
+// 👇 Start handling routes here
+app.use("/api", require("./routes/index.routes"));
+app.use("/auth", require("./routes/auth.routes"));
+app.use("/api/tasks", require("./routes/tasks.routes"));
 
 // ❗ To handle errors. Routes that don't exist or errors that you handle in specific routes
 require("./error-handling")(app);
