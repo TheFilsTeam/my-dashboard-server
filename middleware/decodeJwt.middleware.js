@@ -9,15 +9,16 @@ const jwt = require("jsonwebtoken");
 decodeJwt = async (req, res, next) => {
   if (req.headers && req.headers.authorization) {
       const authorization = req.headers.authorization.split(' ')[1];
-      let jwtContent;
       try {
-            jwtContent = jwt.verify(authorization, process.env.TOKEN_SECRET);
+            let jwtContent = jwt.verify(authorization, process.env.TOKEN_SECRET);
             req.__jwt_content = jwtContent;
-            req.__jwt_userId = jwtContent._id;
-            // Fetch the user by id 
-            const user = await User.findOne({_id: jwtContent._id});
-            delete user.password;
-            req.__jwt_user = user;
+            req.__jwt_userId = jwtContent?._id;
+            if(req.__jwt_userId) {
+              // Fetch the user by id 
+              const user = await User.findOne({_id: jwtContent._id});
+              delete user.password;
+              req.__jwt_user = user;
+            }
        } catch(e) {
             console.log("Error try to extract data from jwt:" + e);
       }
