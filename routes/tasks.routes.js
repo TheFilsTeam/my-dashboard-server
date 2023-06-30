@@ -103,7 +103,7 @@ router.delete('/:taskId', (req, res) => {
     }
 
     Task.findOneAndRemove(query)
-        .then(() => res.json({ message: `Task with id ${taskId} was removed successfully.` }))
+        .then(() => res.json({ message: `Task with id ${query._id} was removed successfully.` }))
         .catch(err => {
             console.log("error deleting task", err);
             res.status(500).json({
