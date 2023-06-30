@@ -72,6 +72,27 @@ router.put('/:taskId', (req, res) => {
         })
 });
 
+// PUT /api/tasks/:taskId/status  -  Updates a specific task by id
+router.put('/:taskId/status', (req, res) => {
+    const query = queryFromParams(req);
+
+    if (!mongoose.Types.ObjectId.isValid(query._id)) {
+        res.status(400).json({ message: 'Specified id is not valid' });
+        return;
+    }
+
+    const finishedDate = req.body.done ? new Date() : null;
+    Task.findOneAndUpdate(query, { finishedDate }, { new: true })
+        .then((updatedTask) => res.json(updatedTask))
+        .catch(err => {
+            console.log("error updating task", err);
+            res.status(500).json({
+                message: "error updating task",
+                error: err
+            });
+        })
+});
+
 // DELETE /api/tasks/:taskId  -  Delete a specific task by id
 router.delete('/:taskId', (req, res) => {
     const query = queryFromParams(req);
