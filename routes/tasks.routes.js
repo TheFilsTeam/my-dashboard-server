@@ -18,9 +18,15 @@ router.post("/", (req, res) => {
 
 router.get("/", (req, res) => {
     console.log("payload", req.payload);
+    
+    const todayDate = new Date(new Date().getFullYear(),new Date().getMonth() , new Date().getDate());
+
     Task.find({owner: req.__jwt_userId})
     //   .populate('owner')
-      .then(response => res.status(200).json(response))
+      .then(tasks => {
+        const displayedTasks = tasks.filter(t=> !t.finishedDate || t.finishedDate > todayDate)
+        res.status(200).json(displayedTasks)
+      })
       .catch(err => res.status(500).json(err));
   });
 
