@@ -15,7 +15,9 @@ decodeJwt = async (req, res, next) => {
             req.__jwt_userId = jwtContent?._id;
             if(req.__jwt_userId) {
               // Fetch the user by id 
-              const user = await User.findOne({_id: jwtContent._id});
+              const userMongo = await User.findOne({_id: jwtContent._id});
+              // Get real object: https://stackoverflow.com/a/60978177/717372
+              const user = userMongo._doc
               delete user.password;
               req.__jwt_user = user;
             }
