@@ -9,6 +9,7 @@ const jwt = require("jsonwebtoken");
 
 // Require the User model in order to interact with the database
 const User = require("../models/User.model");
+const Timer = require("../models/Timer.model");
 
 // Require necessary (isAuthenticated) middleware in order to control access to specific routes
 const { isAuthenticated } = require("../middleware/jwt.middleware.js");
@@ -79,6 +80,14 @@ router.post("/signup", (req, res, next) => {
 
       // Create a new object that doesn't expose the password
       user = { email, name, _id };
+
+      return Timer.create([
+        {title: "Work", duration: 30*60, owner: _id},
+        {title: "Small break", duration: 5*60, owner: _id },
+        {title: "Medium break", duration: 8*60, owner: _id },
+        {title: "Long break", duration: 12*60, owner: _id },]
+        )})
+    .then((createdTimers) => {
       const authToken = createjwtToken(user);
       res.status(200).json({ authToken: authToken });
     })
