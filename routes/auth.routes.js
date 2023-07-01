@@ -16,6 +16,17 @@ const { isAuthenticated } = require("../middleware/jwt.middleware.js");
 // How many rounds should bcrypt run the salt (default - 10 rounds)
 const saltRounds = 10;
 
+const createjwtToken = ({ _id, email, name }) => {
+  // Create an object that will be set as the token payload
+  const payload = { _id, email, name };
+
+  // Create a JSON Web Token and sign it
+  return jwt.sign(payload, process.env.TOKEN_SECRET, {
+    algorithm: "HS256",
+    expiresIn: "6h",
+  });
+}
+
 // POST /auth/signup  - Creates a new user in the database
 router.post("/signup", (req, res, next) => {
   const { email, password, name } = req.body;
@@ -43,6 +54,7 @@ router.post("/signup", (req, res, next) => {
     return;
   }
 
+  let user = null;
   // Check the users collection if a user with the same email already exists
   User.findOne({ email })
     .then((foundUser) => {
@@ -66,10 +78,9 @@ router.post("/signup", (req, res, next) => {
       const { email, name, _id } = createdUser;
 
       // Create a new object that doesn't expose the password
-      const user = { email, name, _id };
-
-      // Send a json response containing the user object
-      res.status(201).json({ user: user });
+      user = { email, name, _id };
+      const authToken = createjwtToken(user);
+      res.status(200).json({ authToken: authToken });
     })
     .catch((err) => next(err)); // In this case, we send error handling to the error handling middleware.
 });
@@ -97,19 +108,7 @@ router.post("/login", (req, res, next) => {
       const passwordCorrect = bcrypt.compareSync(password, foundUser.password);
 
       if (passwordCorrect) {
-        // Deconstruct the user object to omit the password
-        const { _id, email, name } = foundUser;
-
-        // Create an object that will be set as the token payload
-        const payload = { _id, email, name };
-
-        // Create a JSON Web Token and sign it
-        const authToken = jwt.sign(payload, process.env.TOKEN_SECRET, {
-          algorithm: "HS256",
-          expiresIn: "6h",
-        });
-
-        // Send the token as the response
+        const authToken = createjwtToken(foundUser);
         res.status(200).json({ authToken: authToken });
       } else {
         res.status(401).json({ message: "Unable to authenticate the user" });
