@@ -82,10 +82,10 @@ router.post("/signup", (req, res, next) => {
       user = { email, name, _id };
 
       return Timer.create([
-        {title: "Work", duration: 30*60, owner: _id},
-        {title: "Small break", duration: 5*60, owner: _id },
-        {title: "Medium break", duration: 8*60, owner: _id },
-        {title: "Long break", duration: 12*60, owner: _id },]
+        {type: "Work", duration: 30*60, owner: _id},
+        {type: "Break", duration: 5*60, owner: _id },
+        {type: "Break", duration: 8*60, owner: _id },
+        {type: "Break", duration: 12*60, owner: _id },]
         )})
     .then((createdTimers) => {
       const authToken = createjwtToken(user);
