@@ -9,6 +9,7 @@ const { isAuthenticated } = require('../middleware/jwt.middleware.js');
 const Timer = require('../models/Timer.model');
 const { trusted } = require('mongoose');
 var cowsay = require("cowsay-browser");
+const { default: axios } = require('axios');
 
 const random = (array) => array[Math.floor(Math.random()*array.length)];
 const customCowSay = (text) => cowsay.say({
@@ -32,5 +33,10 @@ router.get('/cowsay', isAuthenticated, async (req, res, next) => {
 	res.status(200).json({ text });
 });
 
-
+router.get('/meme', isAuthenticated, async (req, res, next) => {
+	// console.log(`req.payload`, req.payload);
+	axios.get("https://meme-api.com/gimme")
+		.then(response => res.status(200).json(response.data))
+		.catch(e => res.set(500).json(e));
+});
 module.exports = router;
