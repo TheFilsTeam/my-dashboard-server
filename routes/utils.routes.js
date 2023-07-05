@@ -11,7 +11,14 @@ const { trusted } = require('mongoose');
 var cowsay = require("cowsay-browser");
 const { default: axios } = require('axios');
 
-const random = (array) => array[Math.floor(Math.random()*array.length)];
+const random = (array, removeItem = false) =>{
+	const iItem = Math.floor(Math.random()*array.length);
+	const item = array[iItem];
+	if (removeItem) {
+		array.splice(iItem, 1);
+	}
+	return item;
+}
 const customCowSay = (text) => cowsay.say({
 	text : text,
 	e : random(["oO", "==", "XX", "$$", "@@", "**", "--", "OO", "..", "^^", "oo"]),
@@ -103,10 +110,29 @@ const facts = [
 	"When Chuck Norris is web surfing websites get the message \"Warning: Internet Explorer has deemed this user to be malicious or dangerous. Proceed?\"."
 ];
 
-// GET  /auth/verify  -  Used to verify JWT stored on the client
+const getUsers = () => {
+	return ["Sherlock Holmes", "Ada Lovelace", "Brendan Eich", "Jean-Claude Van Damme", "Tim Berners-Lee", "Chuck Norris"];
+}
+
+router.get('/cowgroup', isAuthenticated, async (req, res, next) => {
+	const users = getUsers();
+	let groupsText = "";
+	let isFirst = true;
+	while (users.length) {
+		if(isFirst) {
+			groupsText += random(users, true);
+		}
+		else {
+			groupsText += " - " + random(users, true) + "\n";
+		}
+		isFirst= !isFirst;
+	}
+	
+	res.status(200).json({ text: customCowSay(groupsText) });
+});
+
 router.get('/cowsay', isAuthenticated, async (req, res, next) => {
 	// console.log(`req.payload`, req.payload);
-
 	const wrap = (text) => {
 		const limit = 50;
 		const splitted = text.split(' ');
@@ -137,7 +163,7 @@ router.get('/cowsay', isAuthenticated, async (req, res, next) => {
 		return;
 	}
 
-	const users = ["Sherlock Holmes", "Ada Lovelace", "Brendan Eich", "Tim Berners-Lee", "Chuck Norris"];
+	const users = getUsers();
 	const text = customCowSay(random(users) + ", " + random(["an idea?", "can you help me?", "...", "please...", "what do you think?"]));
 	res.status(200).json({ text });
 });
