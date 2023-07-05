@@ -21,6 +21,7 @@ const userSchema = new Schema(
 		location: {
 			type: String,
 		},
+		users: [String],
 		group: [
 			{
 				type: Schema.Types.ObjectId,

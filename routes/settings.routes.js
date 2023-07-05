@@ -25,7 +25,7 @@ router.get('/settings', isAuthenticated, async (req, res, next) => {
 		return t1.type === "Work" ? -1 : 1;
 	})
 
-	const settings = { ...req.__jwt_user, timers: timers };
+	const settings = { ...req.__jwt_user, timers: timers, friends: req.__jwt_user.users.join(';') };
 	// console.log("user loaded", settings);
 
 	// Send back the token payload object containing the user data
@@ -36,8 +36,9 @@ router.put('/settings', isAuthenticated, (req, res, next) => {
 	// If JWT token is valid the payload gets decoded by the
 	// isAuthenticated middleware and is made available on `req.payload`
 	console.log(`req.payload`, req.payload);
-	console.log(`req.body (data to update)`, req.body);
-	User.findByIdAndUpdate(req.payload._id, req.body)
+	// console.log(`req.body (data to update)`, req.body);
+	const newUser = {...req.body, users: req.body.friends.split(';')};
+	User.findByIdAndUpdate(req.payload._id, newUser)
 		.then((u) => {
 			res.status(200);
 		})

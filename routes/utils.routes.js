@@ -110,25 +110,42 @@ const facts = [
 	"When Chuck Norris is web surfing websites get the message \"Warning: Internet Explorer has deemed this user to be malicious or dangerous. Proceed?\"."
 ];
 
-const getUsers = () => {
-	return ["Sherlock Holmes", "Ada Lovelace", "Brendan Eich", "Jean-Claude Van Damme", "Tim Berners-Lee", "Chuck Norris"];
+const getUsers = (userId) => {
+	const defaultUsers = ["Sherlock Holmes", "Ada Lovelace", "Brendan Eich", "Jean-Claude Van Damme", "Tim Berners-Lee", "Chuck Norris"];
+	return User.findById(userId)
+		.then(user => {
+			console.log("user", user);
+			if (!user?.users || user.users.length === 0) {
+				return defaultUsers;
+			}
+
+			return user.users;
+		})
+		.catch(e => {
+			console.error(e);
+			return defaultUsers;
+		});
+
 }
 
 router.get('/cowgroup', isAuthenticated, async (req, res, next) => {
-	const users = getUsers();
-	let groupsText = "";
-	let isFirst = true;
-	while (users.length) {
-		if(isFirst) {
-			groupsText += random(users, true);
-		}
-		else {
-			groupsText += " - " + random(users, true) + "\n";
-		}
-		isFirst= !isFirst;
-	}
-	
-	res.status(200).json({ text: customCowSay(groupsText) });
+	getUsers(req.payload._id)
+		.then(users => {
+			// console.log("users", users);
+			let groupsText = "";
+			let isFirst = true;
+			while (users.length) {
+				if(isFirst) {
+					groupsText += random(users, true);
+				}
+				else {
+					groupsText += " - " + random(users, true) + "\n";
+				}
+				isFirst= !isFirst;
+			}
+			console.log("groupsText", groupsText);
+			res.status(200).json({ text: customCowSay(groupsText) });
+		});
 });
 
 router.get('/cowsay', isAuthenticated, async (req, res, next) => {
@@ -163,9 +180,11 @@ router.get('/cowsay', isAuthenticated, async (req, res, next) => {
 		return;
 	}
 
-	const users = getUsers();
-	const text = customCowSay(random(users) + ", " + random(["an idea?", "can you help me?", "...", "please...", "what do you think?"]));
-	res.status(200).json({ text });
+	const users = getUsers(req.payload._id)
+	.then(users => {
+		const text = customCowSay(random(users) + ", " + random(["an idea?", "can you help me?", "...", "please...", "what do you think?"]));
+		res.status(200).json({ text });
+	});
 });
 
 router.get('/meme', isAuthenticated, async (req, res, next) => {
