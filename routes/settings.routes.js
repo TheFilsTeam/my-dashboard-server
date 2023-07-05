@@ -17,6 +17,14 @@ router.get('/settings', isAuthenticated, async (req, res, next) => {
 
 	const timers = await Timer.find({ owner: req.payload._id });
 
+	timers.sort((t1, t2) => {
+		if(t1.type === t2.type) {
+			return t1.duration - t2.duration;
+		}
+
+		return t1.type === "Work" ? -1 : 1;
+	})
+
 	const settings = { ...req.__jwt_user, timers: timers };
 	// console.log("user loaded", settings);
 
