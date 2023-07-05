@@ -82,7 +82,7 @@ router.post('/signup', (req, res, next) => {
 			user = { email, name, _id };
 
 			return Timer.create([
-				{ type: 'Work', duration: 30 * 60, owner: _id },
+				{ type: 'Work', duration: 25 * 60, owner: _id },
 				{ type: 'Break', duration: 5 * 60, owner: _id },
 				{ type: 'Break', duration: 8 * 60, owner: _id },
 				{ type: 'Break', duration: 12 * 60, owner: _id },
