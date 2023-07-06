@@ -25,11 +25,7 @@ router.get('/settings', isAuthenticated, async (req, res, next) => {
 		return t1.type === 'Work' ? -1 : 1;
 	});
 
-	const settings = {
-		...req.__jwt_user,
-		timers: timers,
-		friends: req.__jwt_user.users.join(';'),
-	};
+	const settings = { ...req.__jwt_user, timers: timers, friends: req.__jwt_user.users?.join(';') };
 	// console.log("user loaded", settings);
 
 	// Send back the token payload object containing the user data
@@ -41,7 +37,8 @@ router.put('/settings', isAuthenticated, (req, res, next) => {
 	// isAuthenticated middleware and is made available on `req.payload`
 	console.log(`req.payload`, req.payload);
 	// console.log(`req.body (data to update)`, req.body);
-	const newUser = { ...req.body, users: req.body.friends.split(';') };
+	const users = !req.body.friends || !req.body.friends.length === 0 ? [] : req.body.friends.split(';');
+	const newUser = {...req.body, users };
 	User.findByIdAndUpdate(req.payload._id, newUser)
 		.then((u) => {
 			res.sendStatus(200);

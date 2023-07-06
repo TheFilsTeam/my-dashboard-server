@@ -134,6 +134,8 @@ router.get('/cowgroup', isAuthenticated, async (req, res, next) => {
 			// console.log("users", users);
 			let groupsText = "";
 			let isFirst = true;
+			
+			console.log("No users found!", users);
 			while (users.length) {
 				if(isFirst) {
 					groupsText += random(users, true);
@@ -180,7 +182,7 @@ router.get('/cowsay', isAuthenticated, async (req, res, next) => {
 		return;
 	}
 
-	const users = getUsers(req.payload._id)
+	getUsers(req.payload._id)
 	.then(users => {
 		const text = customCowSay(random(users) + ", " + random(["an idea?", "can you help me?", "...", "please...", "what do you think?"]));
 		res.status(200).json({ text });
