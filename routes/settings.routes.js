@@ -18,14 +18,18 @@ router.get('/settings', isAuthenticated, async (req, res, next) => {
 	const timers = await Timer.find({ owner: req.payload._id });
 
 	timers.sort((t1, t2) => {
-		if(t1.type === t2.type) {
+		if (t1.type === t2.type) {
 			return t1.duration - t2.duration;
 		}
 
-		return t1.type === "Work" ? -1 : 1;
-	})
+		return t1.type === 'Work' ? -1 : 1;
+	});
 
-	const settings = { ...req.__jwt_user, timers: timers, friends: req.__jwt_user.users.join(';') };
+	const settings = {
+		...req.__jwt_user,
+		timers: timers,
+		friends: req.__jwt_user.users.join(';'),
+	};
 	// console.log("user loaded", settings);
 
 	// Send back the token payload object containing the user data
@@ -37,10 +41,10 @@ router.put('/settings', isAuthenticated, (req, res, next) => {
 	// isAuthenticated middleware and is made available on `req.payload`
 	console.log(`req.payload`, req.payload);
 	// console.log(`req.body (data to update)`, req.body);
-	const newUser = {...req.body, users: req.body.friends.split(';')};
+	const newUser = { ...req.body, users: req.body.friends.split(';') };
 	User.findByIdAndUpdate(req.payload._id, newUser)
 		.then((u) => {
-			res.status(200);
+			res.sendStatus(200);
 		})
 		.catch((e) => {
 			console.error('Error while updating user settings', e);
