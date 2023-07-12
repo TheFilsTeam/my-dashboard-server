@@ -4,10 +4,6 @@ const router = express.Router();
 // Require the User model in order to interact with the database
 const User = require('../models/User.model');
 
-// Require necessary (isAuthenticated) middleware in order to control access to specific routes
-const { isAuthenticated } = require('../middleware/jwt.middleware.js');
-const Timer = require('../models/Timer.model');
-const { trusted } = require('mongoose');
 var cowsay = require("cowsay-browser");
 const { default: axios } = require('axios');
 
@@ -114,7 +110,7 @@ const getUsers = (userId) => {
 	const defaultUsers = ["Sherlock Holmes", "Ada Lovelace", "Brendan Eich", "Jean-Claude Van Damme", "Tim Berners-Lee", "Chuck Norris"];
 
 	if(!userId) {
-		return defaultUsers;
+		return Promise.resolve(defaultUsers);
 	}
 
 	return User.findById(userId)
