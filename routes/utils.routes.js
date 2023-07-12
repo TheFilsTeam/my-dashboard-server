@@ -112,6 +112,11 @@ const facts = [
 
 const getUsers = (userId) => {
 	const defaultUsers = ["Sherlock Holmes", "Ada Lovelace", "Brendan Eich", "Jean-Claude Van Damme", "Tim Berners-Lee", "Chuck Norris"];
+
+	if(!userId) {
+		return defaultUsers;
+	}
+
 	return User.findById(userId)
 		.then(user => {
 			console.log("user", user);
@@ -128,8 +133,8 @@ const getUsers = (userId) => {
 
 }
 
-router.get('/cowgroup', isAuthenticated, async (req, res, next) => {
-	getUsers(req.payload._id)
+router.get('/cowgroup', async (req, res, next) => {
+	getUsers(req.payload?._id)
 		.then(users => {
 			// console.log("users", users);
 			let groupsText = "";
@@ -150,7 +155,7 @@ router.get('/cowgroup', isAuthenticated, async (req, res, next) => {
 		});
 });
 
-router.get('/cowsay', isAuthenticated, async (req, res, next) => {
+router.get('/cowsay', async (req, res, next) => {
 	// console.log(`req.payload`, req.payload);
 	const wrap = (text) => {
 		const limit = 50;
@@ -176,13 +181,13 @@ router.get('/cowsay', isAuthenticated, async (req, res, next) => {
 		return;
 	}
 
-	if (rand > 0.85) {
+	if (rand > 0.8) {
 		const text = customCowSay(wrap(random(facts)));
 		res.status(200).json({ text });
 		return;
 	}
 
-	getUsers(req.payload._id)
+	getUsers(req.payload?._id)
 	.then(users => {
 		const text = customCowSay(random(users) + ", " + random(["an idea?", "can you help me?", "...", "please...", "what do you think?"]));
 		res.status(200).json({ text });
