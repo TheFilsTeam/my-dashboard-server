@@ -189,7 +189,7 @@ router.get('/cowsay', isAuthenticated, async (req, res, next) => {
 	});
 });
 
-router.get('/meme', isAuthenticated, async (req, res, next) => {
+router.get('/meme', async (req, res, next) => {
 	// console.log(`req.payload`, req.payload);
 	const api = random([{url: "https://meme-factory.adaptable.app/api/memes/random", source: "https://meme-factory-app.netlify.app/", name: "MemeFactory" }, { url: "https://meme-api.com/gimme", name: "Reddit" }])
 	axios.get(api.url)
